@@ -1,0 +1,39 @@
+--- usr/bin/sony-laptop-tools-0.8	2008-09-30 14:30:33.000000000 +0200
++++ usr/bin/sony-laptop-tools	2008-09-30 14:30:27.000000000 +0200
+@@ -83,7 +83,7 @@
+ readonly CODE_GENERIC_ERROR=1
+ readonly CODE_GENERIC_SUCCESS=0
+ 
+-readonly VERSION=0.8
++readonly VERSION=0.8-r1
+ 
+ function log()
+ {
+@@ -307,16 +307,21 @@
+ 	while true
+ 	do
+ 		# Wait for X11 valid display
+-		while ! isX11ValidDisplayAvailable
+-		do
+-			log 'Wait valid X11 display loop...'
+-			sleep $SOFT_KEYS_DAEMON_SLEEP_INTERVAL
+-		done
++		#while ! isX11ValidDisplayAvailable
++		#do
++		#	log 'Wait valid X11 display loop...'
++		#	sleep $SOFT_KEYS_DAEMON_SLEEP_INTERVAL
++		#done
+ 
+ 		# Run keys daemod, but it should be in cycle
+ 		# because exit from X11 will kill it, and service
+ 		# will not restart automatically
+-		$X11WRAPPER $XBINDKEYS -n -f $CONFIG_SOFT_KEYS_FILE
++		result=`$X11WRAPPER $XBINDKEYS -n -f $CONFIG_SOFT_KEYS_FILE 2>&1`
++		if [ `echo "$result" | grep -c 'Could not open display'` != 0 ]
++		then
++			log "X11 display not found, waiting for $SOFT_KEYS_DAEMON_SLEEP_INTERVAL second"
++		fi
++
+ 		sleep $SOFT_KEYS_DAEMON_SLEEP_INTERVAL
+ 	done
+ }
