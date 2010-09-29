@@ -203,6 +203,7 @@ src_install() {
 	fi
 
 	newinitd "${FILESDIR}"/xdm.initd-3 xdm || die "initd file install failed"
+	newinitd "${FILESDIR}"/xdm-setup.initd-1 xdm-setup || die
 	newconfd "${FILESDIR}"/xdm.confd-3 xdm || die
 
 	# install the @x11-module-rebuild set for Portage
