@@ -3,8 +3,8 @@
 # $Header: $
 
 EAPI=3
-XORG_EAUTORECONF="yes"
 inherit xorg-2 multilib versionator
+
 EGIT_REPO_URI="git://anongit.freedesktop.org/git/xorg/xserver"
 
 OPENGL_DIR="xorg-x11"
@@ -13,7 +13,7 @@ DESCRIPTION="X.Org X servers"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc ~x86 ~x86-fbsd"
 
 IUSE_SERVERS="dmx kdrive xorg"
-IUSE="${IUSE_SERVERS} doc hal ipv6 minimal nptl tslib +udev"
+IUSE="${IUSE_SERVERS} doc ipv6 minimal nptl tslib +udev"
 RDEPEND=">=app-admin/eselect-opengl-1.0.8
 	dev-libs/openssl
 	media-libs/freetype
@@ -24,7 +24,7 @@ RDEPEND=">=app-admin/eselect-opengl-1.0.8
 	>=x11-libs/libpciaccess-0.10.3
 	>=x11-libs/libXau-1.0.4
 	>=x11-libs/libXdmcp-1.0.2
-	>=x11-libs/libXfont-1.3.3
+	>=x11-libs/libXfont-1.4.2
 	>=x11-libs/libxkbfile-1.0.4
 	>=x11-libs/pixman-0.15.20
 	>=x11-libs/xtrans-1.2.2
@@ -42,9 +42,9 @@ RDEPEND=">=app-admin/eselect-opengl-1.0.8
 		>=x11-libs/libXres-1.0.3
 		>=x11-libs/libXtst-1.0.3
 	)
-	!udev? ( hal? ( sys-apps/hal ) )
 	kdrive? (
 		>=x11-libs/libXext-1.0.5
+		x11-libs/libXv
 	)
 	!minimal? (
 		>=x11-libs/libX11-1.1.5
@@ -52,10 +52,9 @@ RDEPEND=">=app-admin/eselect-opengl-1.0.8
 		>=media-libs/mesa-7.8_rc[nptl=]
 	)
 	tslib? ( >=x11-libs/tslib-1.0 x11-proto/xcalibrateproto )
-	udev? ( sys-fs/udev )"
+	udev? ( >=sys-fs/udev-150 )"
 
 DEPEND="${RDEPEND}
-	!<x11-apps/xinit-1.2.1-r1
 	sys-devel/flex
 	>=x11-proto/bigreqsproto-1.1.0
 	>=x11-proto/compositeproto-0.4
@@ -78,13 +77,16 @@ DEPEND="${RDEPEND}
 	>=x11-proto/xf86rushproto-1.1.2
 	>=x11-proto/xf86vidmodeproto-2.2.99.1
 	>=x11-proto/xineramaproto-1.1.3
-	>=x11-proto/xproto-7.0.13
+	>=x11-proto/xproto-7.0.17
 	dmx? ( >=x11-proto/dmxproto-2.2.99.1 )
-	doc? ( >=app-doc/doxygen-1.6.1 )
+	doc? (
+		>=app-doc/doxygen-1.6.1
+		app-text/xmlto
+	)
 	!minimal? (
 		>=x11-proto/xf86driproto-2.1.0
-		>=x11-proto/dri2proto-2.1
-		>=x11-libs/libdrm-2.3.0
+		>=x11-proto/dri2proto-2.3
+		>=x11-libs/libdrm-2.4.20
 	)"
 
 PDEPEND="
@@ -95,51 +97,42 @@ EPATCH_FORCE="yes"
 EPATCH_SUFFIX="patch"
 
 # These have been sent upstream
-#UPSTREAMED_PATCHES=(
+UPSTREAMED_PATCHES=(
 #	"${WORKDIR}/patches/"
-#	)
+
+	# http://lists.x.org/archives/xorg-devel/2010-October/014150.html
+	"${FILESDIR}"/"${PN}"-1.9-xinerama-crash-fix.patch
+	)
 
 PATCHES=(
 	"${UPSTREAMED_PATCHES[@]}"
 	"${FILESDIR}"/${PN}-disable-acpi.patch
-	"${FILESDIR}"/${PN}-1.8-nouveau-default.patch
+	"${FILESDIR}"/${PN}-1.9-nouveau-default.patch
 	"${FILESDIR}"/${PN}-switch-group-on-release.patch
+
+	# Fixes for bug #318609
+	"${FILESDIR}"/0001-Fix-tslib-check-fallback-to-set-TSLIB_LIBS.patch
+	"${FILESDIR}"/0002-Fix-linking-with-tslib-with-Wl-as-needed.patch
 	)
 
 pkg_setup() {
-	local myconf
-
 	xorg-2_pkg_setup
 
 	use minimal || ensure_a_server_is_building
 
-	# HAL shebang
-	if use hal; then
-		ewarn "Usage of hal is strongly discouraged. Please migrate to udev."
-		ewarn "From next major release on the hal support will be fully disabled."
-	fi
-	if use hal && use udev; then
-		ewarn "Both hal and udev flags are enabled."
-		ewarn "Enabling only udev!"
-		myconf="
-			$(use_enable udev config-udev)
-			--disable-config-hal
-		"
-	else
-		myconf="
-			$(use_enable hal config-hal)
-			$(use_enable udev config-udev)
-		"
-	fi
-
 	# localstatedir is used for the log location; we need to override the default
-	# from ebuild.sh
+	#	from ebuild.sh
 	# sysconfdir is used for the xorg.conf location; same applies
-	# --enable-install-setuid needed because sparcs default off
+	#	--enable-install-setuid needed because sparcs default off
+	# NOTE: fop is used for doc generating ; and i have no idea if gentoo
+	#	package it somewhere
 	CONFIGURE_OPTIONS="
 		$(use_enable ipv6)
 		$(use_enable dmx)
 		$(use_enable kdrive)
+		$(use_enable kdrive kdrive-kbd)
+		$(use_enable kdrive kdrive-mouse)
+		$(use_enable kdrive kdrive-evdev)
 		$(use_enable tslib)
 		$(use_enable tslib xcalibrate)
 		$(use_enable !minimal xvfb)
@@ -152,28 +145,35 @@ pkg_setup() {
 		$(use_enable !minimal glx)
 		$(use_enable xorg)
 		$(use_enable nptl glx-tls)
+		$(use_enable udev config-udev)
 		$(use_with doc doxygen)
-		${myconf}
+		$(use_with doc xmlto)
 		--sysconfdir=/etc/X11
 		--localstatedir=/var
 		--enable-install-setuid
 		--with-fontrootdir=/usr/share/fonts
 		--with-xkb-output=/var/lib/xkb
+		--disable-config-hal
 		--without-dtrace
+		--without-fop
 		--with-os-vendor=Gentoo
 		${conf_opts}"
 
-	# Due to the limitations of CONFIGURE_OPTIONS, we have to export this.
+	if use kdrive && use tslib; then
+		XORG_EAUTORECONF=yes
+	fi
+
+	# Xorg-server requires includes from OS mesa which are not visible for
+	# users of binary drivers.
+	# Due to the limitations of CONFIGURE_OPTIONS, we have to export this
 	mkdir -p "${T}/mesa-symlinks/GL"
-	pushd "${T}/mesa-symlinks/GL" &> /dev/null
 	for i in gl glx glxmd glxproto glxtokens; do
-		ln -s "${EROOT}usr/$(get_libdir)/opengl/xorg-x11/include/$i.h" $i.h
+		ln -s "${EROOT}usr/$(get_libdir)/opengl/xorg-x11/include/$i.h" "${T}/mesa-symlinks/GL/$i.h" || die
 	done
-	for i in  glext glxext; do
-		ln -s "${EROOT}usr/$(get_libdir)/opengl/global/include/$i.h" $i.h
+	for i in glext glxext; do
+		ln -s "${EROOT}usr/$(get_libdir)/opengl/global/include/$i.h" "${T}/mesa-symlinks/GL/$i.h" || die
 	done
-	popd &> /dev/null
-	export CPPFLAGS="${CPPFLAGS:+${CPPFLAGS} }-I${T}/mesa-symlinks"
+	append-cppflags "-I${T}/mesa-symlinks"
 
 	# (#121394) Causes window corruption
 	filter-flags -fweb
@@ -205,28 +205,19 @@ src_install() {
 
 	server_based_install
 
-	if ! use minimal && use xorg; then
+	if ! use minimal &&	use xorg; then
 		# Install xorg.conf.example into docs
 		dodoc hw/xfree86/xorg.conf.example \
 			|| die "couldn't install xorg.conf.example"
 	fi
 
-	# install the xdm.init
-	cp "${FILESDIR}"/xdm.initd "${T}"
-	if use hal && ! use udev; then
-		sed -i \
-			-e "s/@HALD_DEPEND@/need hald/g" \
-			"${T}"/xdm.initd \
-			|| die "sed failed"
-	else
-		sed -i \
-			-e "/@HALD_DEPEND@/ d" \
-			"${T}"/xdm.initd \
-			|| die "sed failed"
-	fi
-	newinitd "${T}"/xdm.initd xdm || die "initd file install failed"
+	newinitd "${FILESDIR}"/xdm.initd-3 xdm || die "initd file install failed"
 	newinitd "${FILESDIR}"/xdm-setup.initd-1 xdm-setup || die
 	newconfd "${FILESDIR}"/xdm.confd-3 xdm || die
+
+	# install the @x11-module-rebuild set for Portage
+	insinto /usr/share/portage/config/sets
+	newins "${FILESDIR}"/xorg-sets.conf xorg.conf || die
 }
 
 pkg_postinst() {
