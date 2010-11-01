@@ -3,6 +3,9 @@
 # $Header: $
 
 EAPI=3
+# They generate the configure.ac with wrong version of util-macros
+# see bug #339988
+XORG_EAUTORECONF="yes"
 inherit xorg-2 multilib versionator
 
 EGIT_REPO_URI="git://anongit.freedesktop.org/git/xorg/xserver"
@@ -158,10 +161,6 @@ pkg_setup() {
 		--without-fop
 		--with-os-vendor=Gentoo
 		${conf_opts}"
-
-	if use kdrive && use tslib; then
-		XORG_EAUTORECONF=yes
-	fi
 
 	# Xorg-server requires includes from OS mesa which are not visible for
 	# users of binary drivers.
