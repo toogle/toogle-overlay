@@ -2,13 +2,13 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI="2"
+EAPI=3
 
 inherit eutils
 
 DESCRIPTION="Open Source next generation intrusion detection and prevention engine"
 HOMEPAGE="http://openinfosecfoundation.org/"
-SRC_URI="http://openinfosecfoundation.org/download/${P}.tar.gz"
+SRC_URI="http://openinfosecfoundation.org/download/${P/_/}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
