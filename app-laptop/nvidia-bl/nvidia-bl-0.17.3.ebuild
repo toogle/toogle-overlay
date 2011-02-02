@@ -6,7 +6,7 @@ inherit eutils linux-mod linux-info
 
 DESCRIPTION="Nvidia-based graphics adapter backlight driver"
 HOMEPAGE="https://launchpad.net/~mactel-support"
-SRC_URI="https://launchpad.net/~mactel-support/+archive/ppa/+files/${PN}-dkms_${PV}~lucid.tar.gz"
+SRC_URI="https://launchpad.net/~mactel-support/+archive/ppa/+files/${PN}-dkms_${PV}~maverick.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
