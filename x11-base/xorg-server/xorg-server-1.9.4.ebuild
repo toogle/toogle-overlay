@@ -1,11 +1,8 @@
-# Copyright 1999-2010 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Header: /var/cvsroot/gentoo-x86/x11-base/xorg-server/xorg-server-1.9.4.ebuild,v 1.1 2011/02/09 08:55:02 scarabeus Exp $
 
 EAPI=3
-# They generate the configure.ac with wrong version of util-macros
-# see bug #339988
-XORG_EAUTORECONF="yes"
 inherit xorg-2 multilib versionator
 
 EGIT_REPO_URI="git://anongit.freedesktop.org/git/xorg/xserver"
@@ -90,10 +87,10 @@ DEPEND="${RDEPEND}
 		>=x11-proto/xf86driproto-2.1.0
 		>=x11-proto/dri2proto-2.3
 		>=x11-libs/libdrm-2.4.20
-	)"
+	)
+	>=x11-apps/xinit-1.3"
 
 PDEPEND="
-	>=x11-apps/xinit-1.2.1-r1
 	xorg? ( >=x11-base/xorg-drivers-$(get_version_component_range 1-2) )"
 
 EPATCH_FORCE="yes"
@@ -102,9 +99,6 @@ EPATCH_SUFFIX="patch"
 # These have been sent upstream
 UPSTREAMED_PATCHES=(
 #	"${WORKDIR}/patches/"
-
-	# http://lists.x.org/archives/xorg-devel/2010-October/014150.html
-	"${FILESDIR}"/"${PN}"-1.9-xinerama-crash-fix.patch
 	)
 
 PATCHES=(
@@ -224,8 +218,8 @@ pkg_postinst() {
 	eselect opengl set --use-old xorg-x11
 
 	if [[ ${INFO} = yes ]]; then
-		einfo "You should consider reading upgrade guide for this release:"
-		einfo "	http://www.gentoo.org/proj/en/desktop/x/x11/xorg-server-$(get_version_component_range 1-2)-upgrade-guide.xml"
+		elog "You should consider reading upgrade guide for this release:"
+		elog "	http://www.gentoo.org/proj/en/desktop/x/x11/xorg-server-$(get_version_component_range 1-2)-upgrade-guide.xml"
 		echo
 		ewarn "You must rebuild all drivers if upgrading from <xorg-server-$(get_version_component_range 1-2)"
 		ewarn "because the ABI changed. If you cannot start X because"
