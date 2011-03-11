@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/x11-base/xorg-server/xorg-server-1.9.4.ebuild,v 1.1 2011/02/09 08:55:02 scarabeus Exp $
+# $Header: $
 
 EAPI=3
 inherit xorg-2 multilib versionator
@@ -10,7 +10,7 @@ EGIT_REPO_URI="git://anongit.freedesktop.org/git/xorg/xserver"
 OPENGL_DIR="xorg-x11"
 
 DESCRIPTION="X.Org X servers"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc ~x86 ~x86-fbsd"
+KEYWORDS="alpha amd64 arm hppa ia64 ~mips ppc ppc64 sh sparc x86 ~x86-fbsd"
 
 IUSE_SERVERS="dmx kdrive xorg"
 IUSE="${IUSE_SERVERS} doc ipv6 minimal nptl tslib +udev"
@@ -105,11 +105,7 @@ PATCHES=(
 	"${UPSTREAMED_PATCHES[@]}"
 	"${FILESDIR}"/${PN}-disable-acpi.patch
 	"${FILESDIR}"/${PN}-1.9-nouveau-default.patch
-	"${FILESDIR}"/${PN}-switch-group-on-release.patch
-
-	# Fixes for bug #318609
-	"${FILESDIR}"/0001-Fix-tslib-check-fallback-to-set-TSLIB_LIBS.patch
-	"${FILESDIR}"/0002-Fix-linking-with-tslib-with-Wl-as-needed.patch
+	"${FILESDIR}"/${PN}-1.9-switch-on-release.patch
 	)
 
 pkg_setup() {
@@ -200,7 +196,7 @@ src_install() {
 
 	if ! use minimal &&	use xorg; then
 		# Install xorg.conf.example into docs
-		dodoc hw/xfree86/xorg.conf.example \
+		dodoc "${WORKDIR}"/${P}_build/hw/xfree86/xorg.conf.example \
 			|| die "couldn't install xorg.conf.example"
 	fi
 
