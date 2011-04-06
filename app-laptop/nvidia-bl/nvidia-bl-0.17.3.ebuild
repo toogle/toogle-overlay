@@ -10,7 +10,7 @@ SRC_URI="https://launchpad.net/~mactel-support/+archive/ppa/+files/${PN}-dkms_${
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~x86"
+KEYWORDS="~x86 ~amd64"
 IUSE=""
 
 S="${WORKDIR}/${PN}-dkms-${PV}/usr/src/dkms_source_tree"
