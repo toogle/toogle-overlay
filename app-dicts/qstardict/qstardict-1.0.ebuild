@@ -18,11 +18,16 @@ for p in $PLUGINS; do
 	IUSE="${IUSE} ${p}"
 done
 
-RDEPEND="x11-libs/qt-core
-		x11-libs/qt-gui
-		dbus? ( x11-libs/qt-dbus )
-		dev-libs/glib:2"
+RDEPEND="
+ || ( 
+		( x11-libs/qt-core
+		  x11-libs/qt-gui )
+		>x11-libs/qt-4.3
+	)
+	dbus? ( || ( x11-libs/qt-dbus x11-libs/qt[dbus] ) )
+	>=dev-libs/glib-2.0"
 DEPEND="${RDEPEND}"
+PROVIDE="virtual/stardict"
 
 src_prepare() {
 	find "${WORKDIR}" -name '*pr?' -exec sed "s:/lib:/$(get_libdir):" -i '{}' \;
