@@ -51,12 +51,10 @@ RDEPEND=">=app-admin/eselect-opengl-1.0.8
 		>=x11-libs/libXext-1.0.5
 		>=media-libs/mesa-7.8_rc[nptl=]
 	)
-	tslib? ( >=x11-libs/tslib-1.0 x11-proto/xcalibrateproto )
+	tslib? ( >=x11-libs/tslib-1.0 )
 	udev? ( >=sys-fs/udev-150 )
 	>=x11-apps/xinit-1.3"
 
-# dmx+doc DEPEND is a hack, a proper solution needs to be implemented in the
-# xorg-2.eclass for next release
 DEPEND="${RDEPEND}
 	sys-devel/flex
 	>=x11-proto/bigreqsproto-1.1.0
@@ -64,7 +62,7 @@ DEPEND="${RDEPEND}
 	>=x11-proto/damageproto-1.1
 	>=x11-proto/fixesproto-4.1
 	>=x11-proto/fontsproto-2.0.2
-	>=x11-proto/glproto-1.4.11
+	>=x11-proto/glproto-1.4.14
 	>=x11-proto/inputproto-1.9.99.902
 	>=x11-proto/kbproto-1.0.3
 	>=x11-proto/randrproto-1.2.99.3
@@ -80,20 +78,11 @@ DEPEND="${RDEPEND}
 	>=x11-proto/xf86rushproto-1.1.2
 	>=x11-proto/xf86vidmodeproto-2.2.99.1
 	>=x11-proto/xineramaproto-1.1.3
-	>=x11-proto/xproto-7.0.17
-	dmx? (
-		>=x11-proto/dmxproto-2.2.99.1
-		doc? (
-			|| (
-				www-client/links
-				www-client/lynx
-				www-client/w3m
-			)
-		)
-	)
+	>=x11-proto/xproto-7.0.22
+	dmx? ( >=x11-proto/dmxproto-2.2.99.1 )
 	!minimal? (
 		>=x11-proto/xf86driproto-2.1.0
-		>=x11-proto/dri2proto-2.3
+		>=x11-proto/dri2proto-2.6
 		>=x11-libs/libdrm-2.4.20
 	)"
 
@@ -138,7 +127,6 @@ pkg_setup() {
 		$(use_enable kdrive kdrive-mouse)
 		$(use_enable kdrive kdrive-evdev)
 		$(use_enable tslib)
-		$(use_enable tslib xcalibrate)
 		$(use_enable !minimal record)
 		$(use_enable !minimal xfree86-utils)
 		$(use_enable !minimal install-libxf86config)
@@ -201,9 +189,6 @@ pkg_postinst() {
 	eselect opengl set xorg-x11 --use-old
 
 	if [[ ${PV} != 9999 && $(get_version_component_range 2 ${REPLACING_VERSIONS}) != $(get_version_component_range 2 ${PV}) ]]; then
-		elog "You should consider reading upgrade guide for this release:"
-		elog "	http://www.gentoo.org/proj/en/desktop/x/x11/xorg-server-$(get_version_component_range 1-2)-upgrade-guide.xml"
-		echo
 		ewarn "You must rebuild all drivers if upgrading from <xorg-server-$(get_version_component_range 1-2)"
 		ewarn "because the ABI changed. If you cannot start X because"
 		ewarn "of module version mismatch errors, this is your problem."
