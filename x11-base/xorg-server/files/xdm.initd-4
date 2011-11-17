@@ -1,7 +1,7 @@
 #!/sbin/runscript
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License, v2
-# $Header: /var/cvsroot/gentoo-x86/x11-base/xorg-server/files/xdm.initd-3,v 1.2 2011/01/22 15:30:07 lxnay Exp $
+# $Header: /var/cvsroot/gentoo-x86/x11-base/xorg-server/files/xdm.initd-4,v 1.1 2011/11/16 21:49:59 chithanh Exp $
 
 # This is here to serve as a note to myself, and future developers.
 #
@@ -45,9 +45,11 @@ depend() {
 	# (#145219 #180163) Could use lirc mouse as input device
 	# (#70689 comment #92) Start after consolefont to avoid display corruption
 	# (#291269) Start after quota, since some dm need readable home
+	# (#390609) gdm-3 will fail when dbus is not running
 	after bootmisc consolefont modules netmount
 	after readahead-list ypbind autofs openvpn gpm lircmd
 	after quota
+	after dbus
 	before alsasound
 
 	# Start before X
@@ -93,6 +95,11 @@ setup_dm() {
 		lxdm)
 			EXE=/usr/sbin/lxdm-binary
 			PIDFILE=/var/run/lxdm.pid
+			START_STOP_ARGS="--background"
+			;;
+		lightdm)
+			EXE=/usr/sbin/lightdm
+			PIDFILE=/var/run/lightdm.pid
 			START_STOP_ARGS="--background"
 			;;
 		*)

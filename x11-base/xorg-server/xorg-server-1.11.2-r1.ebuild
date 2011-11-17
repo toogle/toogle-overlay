@@ -39,6 +39,7 @@ RDEPEND=">=app-admin/eselect-opengl-1.0.8
 		>=x11-libs/libXfixes-5.0
 		>=x11-libs/libXi-1.2.99.1
 		>=x11-libs/libXmu-1.0.3
+		x11-libs/libXrender
 		>=x11-libs/libXres-1.0.3
 		>=x11-libs/libXtst-1.0.99.2
 	)
@@ -115,7 +116,7 @@ PATCHES=(
 
 pkg_pretend() {
 	# older gcc is not supported
-	[[ $(gcc-major-version) -lt 4 ]] && \
+	[[ "${MERGE_TYPE}" != "binary" && $(gcc-major-version) -lt 4 ]] && \
 		die "Sorry, but gcc earlier than 4.0 wont work for xorg-server."
 }
 
@@ -185,8 +186,8 @@ src_install() {
 	fi
 
 	newinitd "${FILESDIR}"/xdm-setup.initd-1 xdm-setup
-	newinitd "${FILESDIR}"/xdm.initd-3 xdm
-	newconfd "${FILESDIR}"/xdm.confd-3 xdm
+	newinitd "${FILESDIR}"/xdm.initd-4 xdm
+	newconfd "${FILESDIR}"/xdm.confd-4 xdm
 
 	# install the @x11-module-rebuild set for Portage
 	insinto /usr/share/portage/config/sets
