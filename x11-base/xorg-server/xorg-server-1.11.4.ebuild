@@ -1,10 +1,11 @@
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
 EAPI=4
 
 XORG_DOC=doc
+XORG_EAUTORECONF=yes
 inherit xorg-2 multilib versionator
 EGIT_REPO_URI="git://anongit.freedesktop.org/git/xorg/xserver"
 
@@ -29,7 +30,7 @@ RDEPEND=">=app-admin/eselect-opengl-1.0.8
 	>=x11-libs/pixman-0.21.8
 	>=x11-libs/xtrans-1.2.2
 	>=x11-misc/xbitmaps-1.0.1
-	>=x11-misc/xkeyboard-config-1.4
+	>=x11-misc/xkeyboard-config-2.4.1-r3
 	dmx? (
 		x11-libs/libXt
 		>=x11-libs/libdmx-1.0.99.1
@@ -111,6 +112,9 @@ PATCHES=(
 	"${UPSTREAMED_PATCHES[@]}"
 	"${FILESDIR}"/${PN}-disable-acpi.patch
 	"${FILESDIR}"/${PN}-1.9-nouveau-default.patch
+	"${FILESDIR}"/${PN}-1.11-disable-tests-without-ddx.patch
+	"${FILESDIR}"/${PN}-1.11-dix-pointerrootwin-send-focusin.patch
+	"${FILESDIR}"/${PN}-1.11-dix-send-focus-events.patch
 	"${FILESDIR}"/${PN}-1.9-switch-on-release.patch
 )
 
