@@ -19,12 +19,9 @@ for p in $PLUGINS; do
 done
 
 RDEPEND="
- || ( 
-		( x11-libs/qt-core
-		  x11-libs/qt-gui )
-		>x11-libs/qt-4.3
-	)
-	dbus? ( || ( x11-libs/qt-dbus x11-libs/qt[dbus] ) )
+	dev-qt/qtcore
+	dev-qt/qtgui
+	dbus? ( dev-qt/qtdbus )
 	>=dev-libs/glib-2.0"
 DEPEND="${RDEPEND}"
 PROVIDE="virtual/stardict"
@@ -48,7 +45,7 @@ src_compile() {
 	for f in $PLUGINS; do
 		use "${f}" && eplugins="${eplugins} ${f}"
 	done
-	[ "${eplugins}" == "" ] && die "Enable atleast one plugin"
+	[ "${eplugins}" == "" ] && die "Enable at least one plugin"
 
 	eqmake4 "${PN}".pro $QMAKE_FLAGS ENABLED_PLUGINS="${eplugins}" || die "qmake failed"
 	emake || die "emake failed"
