@@ -21,6 +21,7 @@ RDEPEND="dbus? ( sys-apps/dbus )
 		eap-sim? ( sys-apps/pcsc-lite )
 		dev-libs/libnl:3
 		crda? ( net-wireless/crda )
+		!crda? ( net-wireless/wireless-regdb )
 	)
 	!kernel_linux? ( net-libs/libpcap )
 	qt4? (
@@ -123,6 +124,13 @@ src_configure() {
 	# Enabling background scanning.
 	echo "CONFIG_BGSCAN_SIMPLE=y"	>> .config
 	echo "CONFIG_BGSCAN_LEARN=y"	>> .config
+
+	# Skip out on the CRDA and udev requirement
+	# depends on net-wireless/wireless-regdb
+	# NOTE: not recommended but a proposed workaround
+	if use crda ; then
+		echo "CONFIG_CFG80211_INTERNAL_REGDB=y" >> .config
+	fi
 
 	if use dbus ; then
 		echo "CONFIG_CTRL_IFACE_DBUS=y" >> .config
@@ -302,6 +310,19 @@ pkg_postinst() {
 	elog
 	elog "An example configuration file is available for reference in"
 	elog "/usr/share/doc/${PF}/"
+
+	# prevent udev dependency pulled by crda installation
+	if use !crda; then
+		elog ""
+		elog "internal regdb enabled"
+		elog ""
+		elog "The downside to using this option is that you will need to"
+		elog "to rebuild your kernel for any regulatory updates,"
+		elog "therefore using CONFIG_CFG80211_INTERNAL_REGDB is not recommended."
+		elog ""
+		elog "For further information read:"
+		elog "http://wireless.kernel.org/en/developers/Regulatory/CRDA"
+	fi
 
 	if [[ -e ${ROOT}etc/wpa_supplicant.conf ]] ; then
 		echo
