@@ -1,0 +1,28 @@
+diff --git a/kwalletd/kwalletd.cpp b/kwalletd/kwalletd.cpp
+index 0266bdf..20bc8c0 100644
+--- a/kwalletd/kwalletd.cpp
++++ b/kwalletd/kwalletd.cpp
+@@ -49,7 +49,9 @@
+ #include <kpluginfactory.h>
+ #include <kpluginloader.h>
+ #include <KNotification>
++#ifdef HAVE_QGPGME
+ #include <gpgme++/key.h>
++#endif
+ 
+ #include <QtCore/QDir>
+ #include <QTextDocument> // Qt::escape
+diff --git a/kwalletd/kwalletwizard.h b/kwalletd/kwalletwizard.h
+index b29bddc..95b422b 100644
+--- a/kwalletd/kwalletwizard.h
++++ b/kwalletd/kwalletwizard.h
+@@ -20,7 +20,9 @@
+ #define KWALLETWIZARD_H
+ 
+ #include <QWizard>
++#ifdef HAVE_QGPGME
+ #include <gpgme++/key.h>
++#endif
+ 
+ class PageGpgKey;
+ class PagePassword;
