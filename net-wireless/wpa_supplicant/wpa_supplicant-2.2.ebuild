@@ -86,16 +86,8 @@ src_prepare() {
 		sed -e "s/\/usr\/lib/\/usr\/$(get_libdir)/" -i src/eap_peer/Makefile
 	fi
 
-	if use wps; then
-		# In version 2.1, there is a bug, what causes compile to fail.
-		epatch "${FILESDIR}/${P}-NFC-fix.patch"
-	fi
-
 	# bug (320097)
 	epatch "${FILESDIR}/${P}-do-not-call-dbus-functions-with-NULL-path.patch"
-
-	# bug (501828)
-	epatch "${FILESDIR}/${P}-WPA-fix.patch"
 
 	# TODO - NEED TESTING TO SEE IF STILL NEEDED, NOT COMPATIBLE WITH 1.0 OUT OF THE BOX,
 	# SO WOULD BE NICE TO JUST DROP IT, IF IT IS NOT NEEDED.
@@ -299,7 +291,6 @@ src_install() {
 		newins dbus-wpa_supplicant.conf wpa_supplicant.conf
 		insinto /usr/share/dbus-1/system-services
 		doins fi.epitest.hostap.WPASupplicant.service fi.w1.wpa_supplicant1.service
-		keepdir /var/run/wpa_supplicant
 		popd > /dev/null
 	fi
 
