@@ -102,6 +102,7 @@ src_configure() {
 	# Basic setup
 	echo "CONFIG_CTRL_IFACE=y" >> .config
 	echo "CONFIG_BACKEND=file" >> .config
+	echo "CONFIG_IBSS_RSN=y"   >> .config
 
 	# Basic authentication methods
 	# NOTE: we don't set GPSK or SAKE as they conflict
