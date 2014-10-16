@@ -25,6 +25,7 @@ RDEPEND="dbus? ( sys-apps/dbus )
 	)
 	!kernel_linux? ( net-libs/libpcap )
 	qt4? (
+		dev-qt/qtcore:4
 		dev-qt/qtgui:4
 		dev-qt/qtsvg:4
 	)
