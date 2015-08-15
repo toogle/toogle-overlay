@@ -102,11 +102,24 @@ src_prepare() {
 		# generate-libeap-peer.patch comes before
 		# fix-undefined-reference-to-random_get_bytes.patch
 		epatch "${FILESDIR}/${P}-generate-libeap-peer.patch"
-		epatch "${FILESDIR}/${P}-fix-undefined-reference-to-random_get_bytes.patch"
 
 		# multilib-strict fix (bug #373685)
 		sed -e "s/\/usr\/lib/\/usr\/$(get_libdir)/" -i src/eap_peer/Makefile
 	fi
+
+	# bug (548742)
+	epatch "${FILESDIR}/2015-1/0001-P2P-Validate-SSID-element-length-before-copying-it-C.patch"
+	epatch "${FILESDIR}/2015-2/0001-WPS-Fix-HTTP-chunked-transfer-encoding-parser.patch"
+	epatch "${FILESDIR}/2015-3/0001-AP-WMM-Fix-integer-underflow-in-WMM-Action-frame-par.patch"
+	epatch "${FILESDIR}/2015-4/0001-EAP-pwd-peer-Fix-payload-length-validation-for-Commi.patch"
+	epatch "${FILESDIR}/2015-4/0002-EAP-pwd-server-Fix-payload-length-validation-for-Com.patch"
+	epatch "${FILESDIR}/2015-4/0003-EAP-pwd-peer-Fix-Total-Length-parsing-for-fragment-r.patch"
+	epatch "${FILESDIR}/2015-4/0004-EAP-pwd-server-Fix-Total-Length-parsing-for-fragment.patch"
+	epatch "${FILESDIR}/2015-4/0005-EAP-pwd-peer-Fix-asymmetric-fragmentation-behavior.patch"
+
+	# bug (554860)
+	epatch "${FILESDIR}/2015-5/0001-NFC-Avoid-misaligned-read-of-an-NDEF-field.patch"
+	epatch "${FILESDIR}/2015-5/0002-NFC-Fix-payload-length-validation-in-NDEF-record-par.patch"
 
 	# bug (320097)
 	epatch "${FILESDIR}/${P}-do-not-call-dbus-functions-with-NULL-path.patch"
@@ -166,8 +179,9 @@ src_configure() {
 		Kconfig_style_config CTRL_IFACE_DBUS_INTRO
 	fi
 
-	# Enable support for writing debug info to a log file.
+	# Enable support for writing debug info to a log file and syslog.
 	Kconfig_style_config DEBUG_FILE
+	Kconfig_style_config DEBUG_SYSLOG
 
 	if use hs2-0 ; then
 		Kconfig_style_config INTERWORKING
